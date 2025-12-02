@@ -5,6 +5,10 @@ Handles connection to Neo4j database
 
 from neo4j import GraphDatabase
 import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file if it exists
+load_dotenv()
 
 
 class Neo4jConnection:

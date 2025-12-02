@@ -45,23 +45,46 @@ This project implements a basic social networking application with:
    cd NOSQLProject-
    ```
 
-2. **Install Python dependencies**
+2. **Create and activate virtual environment** (recommended)
+   ```bash
+   python3 -m venv venv
+   source venv/bin/activate  # On macOS/Linux
+   # On Windows: venv\Scripts\activate
+   ```
+
+3. **Install Python dependencies**
    ```bash
    pip install -r requirements.txt
    ```
 
-3. **Start Neo4j Database**
+4. **Configure Neo4j credentials**
+   
+   Create a `.env` file in the project root with your Neo4j credentials:
+   ```bash
+   cat > .env << EOF
+   NEO4J_URI=bolt://localhost:7687
+   NEO4J_USER=neo4j
+   NEO4J_PASSWORD=your_password
+   EOF
+   ```
+   
+   **Note:** 
+   - Default credentials are usually `neo4j` / `neo4j` or `neo4j` / `password`
+   - If you're using Neo4j Desktop, check your database connection settings
+   - If you're using Neo4j Community Edition and forgot your password, you can reset it:
+     ```bash
+     neo4j stop
+     neo4j-admin dbms set-initial-password your_new_password
+     neo4j start
+     ```
+     (Note: This only works if the database hasn't been started before. For existing databases, you may need to delete the auth file first.)
+
+5. **Start Neo4j Database**
    - If using Neo4j Desktop: Start your database instance
    - If using Neo4j Community: Run `neo4j start`
    - Default credentials: `neo4j` / `password`
-   - You can set environment variables:
-     ```bash
-     export NEO4J_URI=bolt://localhost:7687
-     export NEO4J_USER=neo4j
-     export NEO4J_PASSWORD=your_password
-     ```
 
-4. **Prepare the dataset**
+6. **Prepare the dataset**
    - Place `CollegeMsg.txt` in the project directory (same folder as main.py)
    - The dataset should be named `CollegeMsg.txt`
 
@@ -70,6 +93,8 @@ This project implements a basic social networking application with:
 Run the setup script to initialize the database schema and load data:
 
 ```bash
+# Make sure virtual environment is activated first
+source venv/bin/activate  # On macOS/Linux
 python setup_database.py
 ```
 
@@ -84,7 +109,15 @@ This will:
 Start the main console application:
 
 ```bash
+# Make sure virtual environment is activated first
+source venv/bin/activate  # On macOS/Linux
 python main.py
+```
+
+**Note:** Always activate the virtual environment before running Python scripts:
+```bash
+source venv/bin/activate  # On macOS/Linux
+# On Windows: venv\Scripts\activate
 ```
 
 ### Menu Options
@@ -204,10 +237,13 @@ NOSQLProject-/
 ## Usage Example
 
 ```bash
-# 1. Setup database Just run this once 
+# 1. Activate virtual environment
+source venv/bin/activate  # On macOS/Linux
+
+# 2. Setup database (just run this once)
 python setup_database.py
 
-# 2. Run application
+# 3. Run application
 python main.py
 
 # 3. In the menu:

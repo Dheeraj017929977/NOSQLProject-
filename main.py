@@ -56,19 +56,21 @@ class SocialNetworkApp:
         print("6. Setup Database (Schema + Load Data)")
         if self.current_user:
             print("\n--- Social Graph Features ---")
-            print("7. Follow User")
-            print("8. Unfollow User")
-            print("9. View Connections (Following & Followers)")
-            print("10. Mutual Connections")
-            print("11. Search Users")
+            print("7.  Follow User (UC-5)")
+            print("8.  Unfollow User (UC-6)")
+            print("9.  View Connections (UC-7)")
+            print("10. Mutual Connections (UC-8)")
+            print("11. Friend Recommendations (UC-9)")
+            print("12. Search Users (UC-10)")
+            print("13. Explore Popular Users (UC-11)")
             print("\n--- Other ---")
-            print("12. Exit")
+            print("14. Exit")
         else:
             print("7. Exit")
         print("=" * 60)
 
     def register_user(self):
-        """Handle user registration"""
+        """Handle user registration (UC-1)"""
         print("\n--- User Registration (UC-1) ---")
         username = input("Username: ").strip()
         if not username:
@@ -100,7 +102,7 @@ class SocialNetworkApp:
             print("You can now login with your credentials.")
 
     def login_user(self):
-        """Handle user login"""
+        """Handle user login (UC-2)"""
         print("\n--- User Login (UC-2) ---")
         username = input("Username: ").strip()
         password = input("Password: ").strip()
@@ -112,7 +114,7 @@ class SocialNetworkApp:
             print(f"Welcome, {user_data['name']}!")
 
     def view_profile(self):
-        """Handle viewing profile"""
+        """Handle viewing profile (UC-3)"""
         if not self.current_user:
             print("\nPlease login first to view your profile.")
             return
@@ -138,7 +140,7 @@ class SocialNetworkApp:
             print(f"\n{message}")
 
     def edit_profile(self):
-        """Handle profile editing"""
+        """Handle profile editing (UC-4)"""
         if not self.current_user:
             print("\nPlease login first to edit your profile.")
             return
@@ -216,12 +218,12 @@ class SocialNetworkApp:
             print("\nNo user logged in")
 
     def follow_user(self):
-        """Handle following a user"""
+        """Handle following a user (UC-5)"""
         if not self.current_user:
             print("\nPlease login first to follow users.")
             return
 
-        print("\n--- Follow User ---")
+        print("\n--- Follow User (UC-5) ---")
         followee_username = input("Enter username to follow: ").strip()
         if not followee_username:
             print("Username cannot be empty")
@@ -233,12 +235,12 @@ class SocialNetworkApp:
         print(f"\n{message}")
 
     def unfollow_user(self):
-        """Handle unfollowing a user"""
+        """Handle unfollowing a user (UC-6)"""
         if not self.current_user:
             print("\nPlease login first to unfollow users.")
             return
 
-        print("\n--- Unfollow User ---")
+        print("\n--- Unfollow User (UC-6) ---")
         followee_username = input("Enter username to unfollow: ").strip()
         if not followee_username:
             print("Username cannot be empty")
@@ -250,13 +252,15 @@ class SocialNetworkApp:
         print(f"\n{message}")
 
     def view_connections(self):
-        """Handle viewing connections"""
+        """Handle viewing connections (UC-7)"""
         if not self.current_user:
             print("\nPlease login first to view connections.")
             return
 
-        print("\n--- View Connections ---")
-        username = input(f"Enter username (or press Enter for your connections): ").strip()
+        print("\n--- View Connections (UC-7) ---")
+        username = input(
+            "Enter username (or press Enter for your connections): "
+        ).strip()
         if not username:
             username = self.current_user["username"]
 
@@ -289,13 +293,15 @@ class SocialNetworkApp:
             print(f"\n{message}")
 
     def mutual_connections(self):
-        """Handle finding mutual connections"""
+        """Handle finding mutual connections (UC-8)"""
         if not self.current_user:
             print("\nPlease login first to find mutual connections.")
             return
 
-        print("\n--- Mutual Connections ---")
-        other_username = input("Enter another username to find mutual connections: ").strip()
+        print("\n--- Mutual Connections (UC-8) ---")
+        other_username = input(
+            "Enter another username to find mutual connections: "
+        ).strip()
         if not other_username:
             print("Username cannot be empty")
             return
@@ -306,7 +312,9 @@ class SocialNetworkApp:
         if success:
             print(f"\n{message}")
             print("\n" + "=" * 60)
-            print(f"MUTUAL CONNECTIONS BETWEEN {self.current_user['username']} AND {other_username}")
+            print(
+                f"MUTUAL CONNECTIONS BETWEEN {self.current_user['username']} AND {other_username}"
+            )
             print("=" * 60)
             if mutual:
                 for i, user in enumerate(mutual, 1):
@@ -319,12 +327,12 @@ class SocialNetworkApp:
             print(f"\n{message}")
 
     def search_users(self):
-        """Handle searching for users"""
+        """Handle searching for users (UC-10)"""
         if not self.current_user:
             print("\nPlease login first to search users.")
             return
 
-        print("\n--- Search Users ---")
+        print("\n--- Search Users (UC-10) ---")
         search_term = input("Enter search term (username or name): ").strip()
         if not search_term:
             print("Search term cannot be empty")
@@ -348,6 +356,60 @@ class SocialNetworkApp:
         else:
             print(f"\n{message}")
 
+    def friend_recommendations(self):
+        """Handle UC-9: Friend Recommendations"""
+        if not self.current_user:
+            print("\nPlease login first to see recommendations.")
+            return
+
+        print("\n--- Friend Recommendations (UC-9) ---")
+        success, recs, message = self.social_graph.recommend_friends(
+            self.current_user["username"]
+        )
+
+        if success:
+            print(f"\n{message}")
+            print("\n" + "=" * 60)
+            print(f"RECOMMENDED USERS FOR @{self.current_user['username']}")
+            print("=" * 60)
+            if recs:
+                for i, user in enumerate(recs, 1):
+                    print(f"{i}. {user['name']} (@{user['username']})")
+                    print(f"   Bio          : {user['bio']}")
+                    print(
+                        f"   Mutual links : {user['mutualCount']} common connection(s)"
+                    )
+            else:
+                print("  No recommendations found (you might already follow many users).")
+            print("=" * 60)
+        else:
+            print(f"\n{message}")
+
+    def explore_popular_users(self):
+        """Handle UC-11: Explore Popular Users"""
+        if not self.current_user:
+            print("\nPlease login first to explore popular users.")
+            return
+
+        print("\n--- Explore Popular Users (UC-11) ---")
+        success, users, message = self.social_graph.get_popular_users()
+
+        if success:
+            print(f"\n{message}")
+            print("\n" + "=" * 60)
+            print("MOST-FOLLOWED USERS")
+            print("=" * 60)
+            if users:
+                for i, user in enumerate(users, 1):
+                    print(f"{i}. {user['name']} (@{user['username']})")
+                    print(f"   Bio      : {user['bio']}")
+                    print(f"   Followers: {user['followers']}")
+            else:
+                print("  No users found in the network.")
+            print("=" * 60)
+        else:
+            print(f"\n{message}")
+
     def run(self):
         """Main application loop"""
         if not self.initialize():
@@ -357,7 +419,7 @@ class SocialNetworkApp:
             try:
                 self.display_main_menu()
                 if self.current_user:
-                    choice = input("\nEnter your choice (1-12): ").strip()
+                    choice = input("\nEnter your choice (1-14): ").strip()
                 else:
                     choice = input("\nEnter your choice (1-7): ").strip()
 
@@ -375,19 +437,23 @@ class SocialNetworkApp:
                     self.setup_database()
                 elif choice == "7":
                     if self.current_user:
-                        self.follow_user()
+                        self.follow_user()           # UC-5
                     else:
                         print("\nThank you for using Social Network Application!")
                         break
                 elif choice == "8" and self.current_user:
-                    self.unfollow_user()
+                    self.unfollow_user()              # UC-6
                 elif choice == "9" and self.current_user:
-                    self.view_connections()
+                    self.view_connections()           # UC-7
                 elif choice == "10" and self.current_user:
-                    self.mutual_connections()
+                    self.mutual_connections()         # UC-8
                 elif choice == "11" and self.current_user:
-                    self.search_users()
+                    self.friend_recommendations()     # UC-9
                 elif choice == "12" and self.current_user:
+                    self.search_users()               # UC-10
+                elif choice == "13" and self.current_user:
+                    self.explore_popular_users()      # UC-11
+                elif choice == "14" and self.current_user:
                     print("\nThank you for using Social Network Application!")
                     break
                 else:

@@ -19,47 +19,42 @@ class DataLoader:
         if not os.path.exists(csv_file):
             return False, f"CSV file not found: {csv_file}"
 
-        session = self.db.get_session()
         try:
             print(f"Loading users from {csv_file}...")
 
-            # First, clear existing users from dataset (optional - comment out if you want to keep them)
-            # session.run("MATCH (u:User) WHERE u.userId IS NOT NULL DELETE u")
-
             loaded_count = 0
-            with open(csv_file, "r") as f:
-                reader = csv.DictReader(f)
-                batch = []
-                batch_size = 1000
+            with self.db.get_session() as session:
+                with open(csv_file, "r", newline="", encoding="utf-8") as f:
+                    reader = csv.DictReader(f)
+                    batch = []
+                    batch_size = 1000
 
-                for row in reader:
-                    batch.append(
-                        {
-                            "userId": row["userId"],
-                            "name": row["name"],
-                            "email": row["email"],
-                        }
-                    )
+                    for row in reader:
+                        batch.append(
+                            {
+                                "userId": row["userId"],
+                                "name": row["name"],
+                                "email": row["email"],
+                            }
+                        )
 
-                    if len(batch) >= batch_size:
+                        if len(batch) >= batch_size:
+                            self._insert_user_batch(session, batch)
+                            loaded_count += len(batch)
+                            print(f"  Loaded {loaded_count} users...")
+                            batch = []
+
+                    # Insert remaining users
+                    if batch:
                         self._insert_user_batch(session, batch)
                         loaded_count += len(batch)
-                        print(f"  Loaded {loaded_count} users...")
-                        batch = []
 
-                # Insert remaining users
-                if batch:
-                    self._insert_user_batch(session, batch)
-                    loaded_count += len(batch)
-
-            session.commit()
+            # no session.commit() needed – each run is autocommitted
             print(f"Successfully loaded {loaded_count} users")
             return True, f"Loaded {loaded_count} users"
 
         except Exception as e:
             return False, f"Error loading users: {str(e)}"
-        finally:
-            session.close()
 
     def _insert_user_batch(self, session, batch):
         """Insert a batch of users"""
@@ -78,44 +73,42 @@ class DataLoader:
         if not os.path.exists(csv_file):
             return False, f"CSV file not found: {csv_file}"
 
-        session = self.db.get_session()
         try:
             print(f"Loading follow relationships from {csv_file}...")
 
             loaded_count = 0
-            with open(csv_file, "r") as f:
-                reader = csv.DictReader(f)
-                batch = []
-                batch_size = 1000
+            with self.db.get_session() as session:
+                with open(csv_file, "r", newline="", encoding="utf-8") as f:
+                    reader = csv.DictReader(f)
+                    batch = []
+                    batch_size = 1000
 
-                for row in reader:
-                    batch.append(
-                        {
-                            "source": row["source"],
-                            "target": row["target"],
-                            "messageCount": int(row.get("messageCount", 0)),
-                        }
-                    )
+                    for row in reader:
+                        batch.append(
+                            {
+                                "source": row["source"],
+                                "target": row["target"],
+                                "messageCount": int(row.get("messageCount", 0)),
+                            }
+                        )
 
-                    if len(batch) >= batch_size:
+                        if len(batch) >= batch_size:
+                            self._insert_follows_batch(session, batch)
+                            loaded_count += len(batch)
+                            print(f"  Loaded {loaded_count} relationships...")
+                            batch = []
+
+                    # Insert remaining relationships
+                    if batch:
                         self._insert_follows_batch(session, batch)
                         loaded_count += len(batch)
-                        print(f"  Loaded {loaded_count} relationships...")
-                        batch = []
 
-                # Insert remaining relationships
-                if batch:
-                    self._insert_follows_batch(session, batch)
-                    loaded_count += len(batch)
-
-            session.commit()
+            # no session.commit() here either
             print(f"Successfully loaded {loaded_count} follow relationships")
             return True, f"Loaded {loaded_count} relationships"
 
         except Exception as e:
             return False, f"Error loading relationships: {str(e)}"
-        finally:
-            session.close()
 
     def _insert_follows_batch(self, session, batch):
         """Insert a batch of follow relationships"""

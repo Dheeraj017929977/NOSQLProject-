@@ -1,3 +1,4 @@
 neo4j==5.15.0
 bcrypt==4.1.2
+python-dotenv==1.0.0
 

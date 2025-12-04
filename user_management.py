@@ -58,7 +58,6 @@ class UserManagement:
 
             record = result.single()
             if record:
-                session.commit()
                 return True, f"User '{record['username']}' registered successfully"
             else:
                 return False, "Registration failed"
@@ -192,7 +191,6 @@ class UserManagement:
             record = result.single()
 
             if record:
-                session.commit()
                 return True, f"Profile updated successfully for '{record['username']}'"
             else:
                 return False, "User not found"

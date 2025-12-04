@@ -16,3 +16,4 @@ fi
 # Run the setup script
 python3 setup_database.py
 
+

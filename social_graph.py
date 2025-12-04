@@ -63,7 +63,6 @@ class SocialGraph:
             )
             record = result.single()
             if record:
-                session.commit()
                 return True, f"Successfully followed {followee_username}"
             else:
                 return False, "Failed to create follow relationship"
@@ -97,7 +96,6 @@ class SocialGraph:
             )
             record = result.single()
             if record:
-                session.commit()
                 return True, f"Successfully unfollowed {followee_username}"
             else:
                 return False, f"Not following {followee_username}"
